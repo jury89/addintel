@@ -51,7 +51,7 @@ class Luigis
     }
 
     // todo create this function (use the oven to bake the pizza)
-    private function cook(Pizza &$pizza): void
+    private function cook(Pizza $pizza): void
     {
 
     }

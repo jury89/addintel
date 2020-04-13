@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
 
@@ -51,9 +52,20 @@ class Order extends Model
         );
     }
 
-    // todo create this function (returns order price)
+    public function orderRecipes(): HasMany
+    {
+        return $this->hasMany(OrderRecipe::class);
+    }
+
     public function getPriceAttribute(): float
     {
+        $price = 0;
 
+        /** @var OrderRecipe $orderRecipe */
+        foreach ($this->orderRecipes()->get() as $orderRecipe) {
+            $price += Recipe::find($orderRecipe->recipe_id)->price;
+        }
+
+        return $price;
     }
 }
