@@ -40,18 +40,17 @@ class OrderingTest extends TestCase
             $this->assertEquals(6.99, $order->getPriceAttribute());
 
 
-//            // 2) Deliver the order
-//            $pizzas = $this->luigis->deliver($order);
-//
-//            $this->assertCount(1, $pizzas);
-//
-//
-//            // 3) Verify the order
-//            /** @var Pizza $pizza */
-//            $pizza = $pizzas->first();
-//            $this->assertEquals('Margherita', $pizza->getName());
-//            $this->assertEquals(Pizza::STATUS_COOKED, $pizza->getStatus());
-//
+            // 2) Deliver the order
+            $pizzas = $this->luigis->deliver($order);
+
+            $this->assertCount(1, $pizzas);
+
+            // 3) Verify the order
+            /** @var Pizza $pizza */
+            $pizza = $pizzas->first();
+            $this->assertEquals('Margherita', $pizza->getName());
+            $this->assertEquals(Pizza::STATUS_COOKED, $pizza->getStatus());
+
 //            // 4) Eat the pizza
 //            $pizza->eatSlice();
 //

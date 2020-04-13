@@ -4,7 +4,9 @@ namespace App\Utilities;
 
 use App\Models\Ingredient;
 use App\Models\Order;
+use App\Models\OrderRecipe;
 use App\Models\Recipe;
+use App\Models\RecipeIngredient;
 use Illuminate\Support\Collection;
 
 class Luigis
@@ -29,30 +31,52 @@ class Luigis
     }
 
     // todo create this function (returns a collection of cooked pizzas)
+
     /**
      * @param Order $order
      * @return Pizza[]|Collection
      */
     public function deliver(Order $order): Collection
     {
-        // prepare and cook each recipe in the order
+        $pizzas = new Collection();
+
+        /** @var OrderRecipe $orderRecipe */
+        foreach ($order->orderRecipes()->get() as $orderRecipe) {
+            $pizza = $this->prepare(Recipe::find($orderRecipe->recipe_id));
+            $this->cook($pizza);
+
+            $pizzas[] = $pizza;
+        }
+
+        return $pizzas;
     }
 
-    // todo create this function (returns a raw pizza)
-    // note:
-    //  you can only create a new Pizza if you first take all the
-    //  ingredients required by the recipe from the fridge
     private function prepare(Recipe $recipe): Pizza
     {
-        // 1) Check fridge has enough of each ingredient
-        // 2) restockFridge if needed
-        // 3) take ingredients from the fridge
-        // 4) create new Pizza
+        $fridge = new Fridge();
+        /** @var Ingredient $ingredient */
+        foreach ($recipe->ingredients as $ingredient) {
+            /** @var RecipeIngredient $recipeIngredient */
+            $recipeIngredient = RecipeIngredient::where('recipe_id', '=', $recipe->id)
+                ->where('ingredient_id', '=', $ingredient->id)
+                ->first();
+
+            $amount = $recipeIngredient->amount;
+
+            if (false === $fridge->has($ingredient, $amount)) {
+                $fridge->add($ingredient, ($amount - $fridge->amount($ingredient)));
+            }
+
+            $fridge->take($ingredient, $amount);
+        }
+
+        return new Pizza($recipe);
     }
 
-    // todo create this function (use the oven to bake the pizza)
     private function cook(Pizza $pizza): void
     {
-
+        $oven = new ElectricOven();
+        $oven->heatUp();
+        $oven->bake($pizza);
     }
 }

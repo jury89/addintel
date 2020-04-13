@@ -22,9 +22,9 @@ class Fridge
 
     public function add(Ingredient $ingredient, int $amount): self
     {
-        $class = get_class($ingredient);
-        if (!isset($this->stock[$class])) {
-            $this->stock[$class] = 0;
+        $name = $ingredient->name;
+        if (!isset($this->stock[$name])) {
+            $this->stock[$name] = 0;
         }
 
         $this->updateStock($ingredient, $amount);
@@ -46,13 +46,12 @@ class Fridge
 
     private function updateStock(Ingredient $ingredient, int $amount): void
     {
-        $class = get_class($ingredient);
-
-        $this->stock[$class] += $amount;
+        $name = $ingredient->name;
+        $this->stock[$name] += $amount;
 
         $ingredient->stock()->updateOrCreate(
             ['ingredient_id' => $ingredient->id],
-            ['amount' => $this->stock[$class]]
+            ['amount' => $this->stock[$name]]
         );
         $ingredient->refresh();
     }
@@ -60,12 +59,13 @@ class Fridge
     // Check this fridge stock, not ingredient relation. See updateStock on how the stock works
     public function amount(Ingredient $ingredient): int
     {
-        return $this->stock[get_class($ingredient)] ?? 0;
+        return $this->stock[$ingredient->name] ?? 0;
     }
 
-    // TODO: create this function
     public function has(Ingredient $ingredient, int $amount): bool
     {
+        $name = $ingredient->name;
 
+        return isset($this->stock[$name]) && $this->stock >= $amount;
     }
 }

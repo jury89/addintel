@@ -17,6 +17,8 @@ use Illuminate\Support\Collection;
  * @property string $status
  *
  * @property Collection|Recipe[] $recipes
+ *
+ * @property-read Collection|OrderRecipe[] $orderRecipes
  */
 class Order extends Model
 {
@@ -62,7 +64,7 @@ class Order extends Model
         $price = 0;
 
         /** @var OrderRecipe $orderRecipe */
-        foreach ($this->orderRecipes()->get() as $orderRecipe) {
+        foreach ($this->orderRecipes as $orderRecipe) {
             $price += Recipe::find($orderRecipe->recipe_id)->price;
         }
 
